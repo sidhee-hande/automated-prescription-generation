@@ -1,0 +1,2 @@
+SPEECH_KEY= "95fd7af718fe465bb0cbcfee48563a86"
+SPEECH_REGION= "eastus"
