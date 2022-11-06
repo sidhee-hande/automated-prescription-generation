@@ -2,6 +2,8 @@ from azure.cosmos.aio import CosmosClient as cosmos_client
 from azure.cosmos import PartitionKey, exceptions
 import asyncio
 import patients
+from process_text import process_text
+from speech_recognition import begin_recognizing
 
 # <add_uri_and_key>
 endpoint = "https://sadman123.documents.azure.com:443"
@@ -10,7 +12,7 @@ key = "Mn6etXvytGjBnqZ2ItEIxyzg7Kvn5gcd4oJJ8eBzyjCa8Es1WDO8KOuXvfeHTE1wFYntH1nhd
 
 # <define_database_and_container_name>
 database_name = 'prescriptions'
-container_name = 'meetings'
+container_name = 'prescriptions'
 
 
 # get DB or create if it doesn't exist
@@ -48,8 +50,6 @@ async def populate_container_items(container_obj, items_to_create):
     # <create_item>
     for family_item in family_items_to_create:
         inserted_item = await container_obj.create_item(body=family_item)
-        print("Inserted item for %s family. Item Id: %s" %
-              (inserted_item['lastName'], inserted_item['id']))
 
 
 # <method_read_items>
@@ -83,6 +83,7 @@ async def query_items(container_obj, query_text):
     print('Query returned {0} items. Operation consumed {1} request units'.format(
         len(items), request_charge))
     # </query_items>
+    return items
 
 
 # runs everything
@@ -109,7 +110,45 @@ async def run_sample():
             print("\nQuickstart complete")
 
 
+async def send_data(data):
+    async with cosmos_client(endpoint, credential=key) as client:
+        # </create_cosmos_client>
+        try:
+            database_obj = await get_or_create_db(client, database_name)
+            container_obj = await get_or_create_container(database_obj, container_name)
+            # generate some family items to test create, read, delete operations
+            await populate_container_items(container_obj, data)
+        except exceptions.CosmosHttpResponseError as e:
+            print('\nsend data has caught an error. {0}'.format(e.message))
+
+
+async def get_data(query):
+    async with cosmos_client(endpoint, credential=key) as client:
+        # </create_cosmos_client>
+        try:
+            database_obj = await get_or_create_db(client, database_name)
+            container_obj = await get_or_create_container(database_obj, container_name)
+            # generate some family items to test create, read, delete operations
+            items = await query_items(container_obj, query)
+        except exceptions.CosmosHttpResponseError as e:
+            print('\nsend data has caught an error. {0}'.format(e.message))
+
+# <python_main>
+# if __name__ == "__main__":
+    #loop = asyncio.get_event_loop()
+    # loop.run_until_complete(run_sample())
+
+
+async def start_process():
+    text = ""
+    with open('convo.txt', 'r') as f:
+        text = f.read()
+    processed_text = process_text(text)
+
+    await send_data([processed_text])
+
+
 # <python_main>
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(run_sample())
+    loop.run_until_complete(start_process())
