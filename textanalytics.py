@@ -1,7 +1,7 @@
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.textanalytics import TextAnalyticsClient
 from click import DateTime
-from config import textanalyticskey
+from backend.config import textanalyticskey
 
 from datetime import date
 
