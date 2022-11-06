@@ -8,5 +8,6 @@
 
 # To run Vue:
 # cd frontend
+# npm run install
 # npm run serve
 # Available on http://localhost:8080/
