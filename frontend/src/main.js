@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import VueRouter from 'vue-router'
-import HelloWorld from './components/HelloWorld'
+import Prescription from './components/Prescription.vue'
 Vue.config.productionTip = false
 import axios from 'axios'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -10,6 +10,10 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+import VueSpeech from 'vue-speech'
+ 
+ 
+Vue.use(VueSpeech)
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
@@ -20,7 +24,7 @@ Vue.prototype.$http = axios;
 Vue.use(VueRouter);
 
 const routes = [
-  { path: '/', component: HelloWorld },
+  { path: '/', component: Prescription },
   
 ]
 

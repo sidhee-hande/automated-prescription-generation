@@ -2,7 +2,81 @@ from azure.core.credentials import AzureKeyCredential
 from azure.ai.textanalytics import TextAnalyticsClient
 from click import DateTime
 from config import textanalyticskey
+from flask import request
+from azure.cosmos.aio import CosmosClient as cosmos_client
+from azure.cosmos import PartitionKey, exceptions
+import asyncio 
 
+# <add_uri_and_key>
+endpoint = "https://sadman123.documents.azure.com:443"
+key = "Mn6etXvytGjBnqZ2ItEIxyzg7Kvn5gcd4oJJ8eBzyjCa8Es1WDO8KOuXvfeHTE1wFYntH1nhdICGOtWtLVrYXQ=="
+# <define_database_and_container_name>
+database_name = 'prescriptions'
+container_name = 'meetings'
+
+
+# get DB or create if it doesn't exist
+def get_or_create_db(client, database_name):
+    try:
+        database_obj = client.get_database_client(database_name)
+        database_obj.read()
+        return database_obj
+    except exceptions.CosmosResourceNotFoundError:
+        print("getting database")
+        return client.create_database(database_name)
+
+
+# get container or create if it doesn't exist
+def get_or_create_container(database_obj, container_name):
+    try:
+        todo_items_container = database_obj.get_container_client(
+            container_name)
+        todo_items_container.read()
+        return todo_items_container
+    except exceptions.CosmosResourceNotFoundError:
+        print("Creating container with lastName as partition key")
+        return database_obj.create_container(
+            id=container_name,
+            partition_key=PartitionKey(path="/lastName"),
+            offer_throughput=400)
+    except exceptions.CosmosHttpResponseError:
+        raise
+
+
+# add stuff to the container
+def populate_container_items(container_obj, items_to_create):
+    # Add items to the container
+    family_items_to_create = items_to_create
+    # <create_item>
+    for family_item in family_items_to_create:
+        inserted_item =  container_obj.create_item(body=family_item)
+        print("Inserted item for %s family. Item Id: %s" %
+              (inserted_item['lastName'], inserted_item['id']))
+
+def run_sample():
+    # <create_cosmos_client>
+    with cosmos_client(endpoint, credential=key) as client:
+        # </create_cosmos_client>
+        try:
+            # create a database
+            database_obj = get_or_create_db(client, database_name)
+            # create a container
+            container_obj = get_or_create_container(database_obj, container_name)
+            # # generate some family items to test create, read, delete operations
+            # items_to_create = [
+            #     patients.get_smith_item(), patients.get_johnson_item()]
+            # # populate the family items in container
+            # await populate_container_items(container_obj, items_to_create)
+
+            # query = "SELECT * FROM c WHERE c.lastName IN ('Smith', 'Andersen')"
+            # await query_items(container_obj, query)
+        except exceptions.CosmosHttpResponseError as e:
+            print('\nrun_sample has caught an error. {0}'.format(e.message))
+        finally:
+            print("\nQuickstart complete")
+            return database_obj, container_obj
+
+              
 from datetime import date
 
 from app import app
@@ -19,14 +93,22 @@ def get_todos():
    
     return "Get Request API Check"
 
-@app.route('/api/startrecording', methods=['GET'])
+@app.route('/api/saveprescription', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type'])
-def start_recording():
-   
-    return "Recording started"
+def save_data():
+    
+    database_obj, container_obj = run_sample()
+    print(run_sample)
+   #save prescription in database
+    prescription = request.json["prescription"]
+    print(prescription)
+    #container_obj = ""
+
+    populate_container_items(container_obj, prescription)
+    return "Data Saved"
 
 
-@app.route('/api/generateprescription', methods=['GET'])
+@app.route('/api/generateprescription', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type'])
 def get_prescription():
    
@@ -34,10 +116,9 @@ def get_prescription():
     text_analytics_client = TextAnalyticsClient(endpoint="https://automaticprescriptiongenerator.cognitiveservices.azure.com/", credential=credential)
     
     #read the transcript from database
-    documents = [""" Subject's name is Jeff Bezos. He is 45 years old. Subject is showing signs of chest pain, cough and fever.
-I suspect it to be a case of Covid-19. 
-Subject is advised to take 100mg of ibuprofen twice daily."""]
-
+    
+    documents = [ request.json["transcript"]]
+    print(documents)
 
     patientname=''
     age=''
@@ -120,21 +201,30 @@ Subject is advised to take 100mg of ibuprofen twice daily."""]
         print(frequencyofmedication)
         print(relations)
 
+
+        symptomsoutput = " ".join(symptoms)
+        diagnosisoutput = " ".join(diagnosis)
+        medicinesoutput = " ".join(medicines)
+        dosageofmedicationoutput = " ".join(dosageofmedication)
+        frequencyofmedicationoutput = " ".join(frequencyofmedication)
+
         prescription=dict()
         patientid=1
         prescription[patientid]= {
             "name": patientname,
             "age" : age, 
             "date" : todaysdate,
-            "symptoms": symptoms,
-            "diagnosis": diagnosis, 
-            "medicines": medicines,
-            "dosageofmedication": dosageofmedication,
-            "frequencyofmedication": frequencyofmedication
+            "symptoms": symptomsoutput,
+            "diagnosis": diagnosisoutput, 
+            "medicines": medicinesoutput,
+            "dosageofmedication": dosageofmedicationoutput,
+            "frequencyofmedication": frequencyofmedicationoutput,
+            "edit": True
+           
         }
 
         print(prescription)
 
 
 
-        return prescription
+        return prescription[patientid]
