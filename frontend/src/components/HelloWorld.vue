@@ -1,3 +1,4 @@
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <template>
   <div>
     <form @submit.prevent="submitForm" v-if="!formSubmitted">
@@ -31,9 +32,11 @@
     </div>
   </div>
 </template>
-
+ 
 <script>
 import jsPDF from 'jspdf'
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -47,12 +50,23 @@ export default {
     };
   },
   methods: {
+
     submitForm: function () {
       this.createPDF()
       this.formSubmitted = true
+      axios
+        .post('/cat', {
+          name: "Alice",
+        }).then(function (response) {
+              console.log(response);
+          }).catch(function (error) {
+              console.log(error);
+          });
+
     },
 
     createPDF() {
+
       let pdfName = 'test';
       var doc = new jsPDF();
       doc.text("Name: " + this.name, 10, 10);
@@ -62,7 +76,11 @@ export default {
       doc.text("Diagnosis: " + this.Diagnosis, 10, 50);
       doc.text("Medicines: " + this.Medicines, 10, 60);
       doc.save(pdfName + '.pdf');
-    }
+
+
+
+    },
+
 
 
   },
@@ -240,6 +258,22 @@ export default {
   }
 }
 </script>
+
+    
+    sendEmail() {
+      const smtp = require("smtp")
+      smtp.Email.send({
+        Host: "smtp.gmail.com",
+        Username: "skc86@cornell.edu",
+        Password: "password",
+        To: 'skc86@cornell.edu',
+        From: 'skc86@cornell.edu',
+        Subject: "a",
+        Body: "b",
+      }).then(
+        alert("mail sent successfully")
+      );
+    },
 
 <style>
 #app {
