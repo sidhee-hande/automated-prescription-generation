@@ -17,7 +17,7 @@
     </label>
    </div>
    
- <div id="app" class="container">
+ <div id="pdf" class="container">
   <h1 > PRESCRIPTION  </h1>
     <div class="card">
     <div class="row">
@@ -145,6 +145,7 @@ Sign prescription
 
 <script>
 import axios from 'axios'
+import jsPDF from 'jspdf'
 export default {
   name: "Prescription-Page",
   components: {},
@@ -188,9 +189,29 @@ export default {
   methods: 
     {
       saveprescription() {
-
-        axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items} )
+        this.createPDF()
+        //axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items} )
       },
+      
+    createPDF() {
+
+    let pdf = new jsPDF('p', 'pt', 'a4');
+    let pWidth = pdf.internal.pageSize.width; // 595.28 is the width of a4
+    let srcWidth = document.getElementById('pdf').scrollWidth;
+    let margin = 30; // narrow margin - 1.27 cm (36);
+    let scale = (pWidth - margin * 2) / srcWidth;
+   
+    pdf.html(document.getElementById('pdf'), {
+        x: margin,
+        y: margin,
+        html2canvas: {
+            scale: scale,
+        },
+        callback: function () {
+             pdf.save('Prescription.pdf')
+        }
+    });
+    },
       
       editRowHandler(data) {
         this.items[data.index].isEdit = !this.items[data.index].isEdit;

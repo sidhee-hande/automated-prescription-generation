@@ -24,7 +24,8 @@ Vue.prototype.$http = axios;
 Vue.use(VueRouter);
 
 const routes = [
-  { path: '/', component: Prescription },
+  { path: '/prescription', component: Prescription },
+  { path: '/' }
   
 ]
 
