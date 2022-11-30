@@ -19,9 +19,11 @@ database_name = 'prescriptions'
 
 # get DB or create if it doesn't exist
 async def get_or_create_db(client, database_name):
+    print("FN 1")
     try:
         database_obj = client.get_database_client(database_name)
-        database_obj.read()
+        await database_obj.read()
+        print( "FN 1 Database",database_obj)
         return database_obj
     except exceptions.CosmosResourceNotFoundError:
         print("getting database")
@@ -30,10 +32,12 @@ async def get_or_create_db(client, database_name):
 
 # get container or create if it doesn't exist
 async def get_or_create_container(database_obj, container_name):
+    print("FN 2")
     try:
         todo_items_container = database_obj.get_container_client(
             container_name)
-        todo_items_container.read()
+        await todo_items_container.read()
+        print( "FN 2 Container", todo_items_container)
         return todo_items_container
     except exceptions.CosmosResourceNotFoundError:
         print("Creating container with lastName as partition key")
@@ -48,12 +52,19 @@ async def get_or_create_container(database_obj, container_name):
 # add stuff to the container
 async def populate_container_items(container_obj, items_to_create):
     # Add items to the container
+    print("FN 3")
+    # items_to_create = [ {
+    #     'id': 'fhsbfksf' + str(uuid.uuid4()),
+    #     'lastName': 'Johnson',
+    #     'district': None,
+    #     'registered': False
+    # }]
     family_items_to_create = items_to_create
     # <create_item>
     for family_item in family_items_to_create:
         inserted_item = await container_obj.create_item(body=family_item)
-        print("Inserted item for %s family. Item Id: %s" %
-              (inserted_item['lastName'], inserted_item['id']))
+        print("Inserted item for Item Id: %s" %
+              ( inserted_item['id']))
 
 
 async def run_sample(endpoint, key, database_name, container_name, prescription):
@@ -74,14 +85,14 @@ async def run_sample(endpoint, key, database_name, container_name, prescription)
 
             # query = "SELECT * FROM c WHERE c.lastName IN ('Smith', 'Andersen')"
             # await query_items(container_obj, query)
-            data = "Data saved successfully!"
+            print("Data saved successfully!")
         except exceptions.CosmosHttpResponseError as e:
             print('\nrun_sample has caught an error. {0}'.format(e.message))
             data = '\nrun_sample has caught an error. {0}'.format(e.message)
         finally:
             print("\nQuickstart complete")
             return data 
-            return database_obj, container_obj
+            \
 
 # if __name__ == "__main__":
 
@@ -115,17 +126,13 @@ async def dummy_data():
 @route_cors(allow_origin="*")
 async def save_data():
    # save prescription in database
-    prescription = request.json["prescription"]
+    data = await request.get_json()
+    prescription =  data["prescription"]
+    prescription["id"] = str(uuid.uuid4())
     print(prescription)
     #container_obj = ""
     container_name = 'prescriptions'
     message = await run_sample(endpoint, key, database_name, container_name, prescription)
-    # task = asyncio.create_task( run_sample(endpoint, key, database_name, container_name, prescription))
-    # print(task)
-    # message = await asyncio.gather(task)
-
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete( run_sample(endpoint, key, database_name, container_name, prescription))
     return message
 
 
