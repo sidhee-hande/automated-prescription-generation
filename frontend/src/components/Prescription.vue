@@ -201,7 +201,7 @@ export default {
       this.sendEmail()
       this.createPDF()
 
-      //axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items} )
+      axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items} )
     },
 
     createPDF() {

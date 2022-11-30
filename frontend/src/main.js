@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import VueRouter from 'vue-router'
 import Prescription from './components/Prescription.vue'
+import Dashboard from './components/Dashboard.vue'
 Vue.config.productionTip = false
 import axios from 'axios'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -25,7 +26,7 @@ Vue.use(VueRouter);
 
 const routes = [
   { path: '/prescription', component: Prescription },
-  { path: '/' }
+  { path: '/dashboard', component: Dashboard }
   
 ]
 

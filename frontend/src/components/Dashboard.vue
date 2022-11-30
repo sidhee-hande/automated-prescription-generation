@@ -11,9 +11,9 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 export default {
-  name: "Prescription-Page",
+  name: "Dashboard-Page",
   components: {},
   data() {
     return {

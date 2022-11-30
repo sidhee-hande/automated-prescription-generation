@@ -1,15 +1,20 @@
-from flask_cors import CORS, cross_origin
+# from quart_cors import CORS, cross_origin
+from quart_cors import route_cors
 from app import app
 from datetime import date
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.textanalytics import TextAnalyticsClient
 from click import DateTime
 from config import textanalyticskey
-from flask import request
+from quart import request
 from azure.cosmos.aio import CosmosClient as cosmos_client
 from azure.cosmos import PartitionKey, exceptions
 import asyncio
 import uuid
+endpoint = "https://sadman123.documents.azure.com:443"
+key = "Mn6etXvytGjBnqZ2ItEIxyzg7Kvn5gcd4oJJ8eBzyjCa8Es1WDO8KOuXvfeHTE1wFYntH1nhdICGOtWtLVrYXQ=="
+    # <define_database_and_container_name>
+database_name = 'prescriptions'
 
 
 # get DB or create if it doesn't exist
@@ -51,8 +56,10 @@ async def populate_container_items(container_obj, items_to_create):
               (inserted_item['lastName'], inserted_item['id']))
 
 
-async def run_sample(endpoint, key, database_name, container_name):
-    # <create_cosmos_client>
+async def run_sample(endpoint, key, database_name, container_name, prescription):
+    data = " "
+    
+    #<create_cosmos_client>
     async with cosmos_client(endpoint, key) as client:
         # </create_cosmos_client>
         try:
@@ -62,34 +69,31 @@ async def run_sample(endpoint, key, database_name, container_name):
             container_obj = await get_or_create_container(
                 database_obj, container_name)
             # # generate some family items to test create, read, delete operations
-            items_to_create = [{
-                'id': 'BEZOS' + str(uuid.uuid4()),
-                'lastName': 'Johnson',
-                'district': None,
-                'registered': False
-            }]
+            items_to_create = [ prescription]
             await populate_container_items(container_obj, items_to_create)
 
             # query = "SELECT * FROM c WHERE c.lastName IN ('Smith', 'Andersen')"
             # await query_items(container_obj, query)
+            data = "Data saved successfully!"
         except exceptions.CosmosHttpResponseError as e:
             print('\nrun_sample has caught an error. {0}'.format(e.message))
+            data = '\nrun_sample has caught an error. {0}'.format(e.message)
         finally:
             print("\nQuickstart complete")
-            # return database_obj, container_obj
+            return data 
+            return database_obj, container_obj
 
+# if __name__ == "__main__":
 
-if __name__ == "__main__":
-
-    # <add_uri_and_key>
-    endpoint = "https://sadman123.documents.azure.com:443"
-    key = "Mn6etXvytGjBnqZ2ItEIxyzg7Kvn5gcd4oJJ8eBzyjCa8Es1WDO8KOuXvfeHTE1wFYntH1nhdICGOtWtLVrYXQ=="
-    # <define_database_and_container_name>
-    database_name = 'prescriptions'
-    container_name = 'meetings'
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(run_sample(
-        endpoint, key, database_name, container_name))
+#     # <add_uri_and_key>
+#     endpoint = "https://sadman123.documents.azure.com:443"
+#     key = "Mn6etXvytGjBnqZ2ItEIxyzg7Kvn5gcd4oJJ8eBzyjCa8Es1WDO8KOuXvfeHTE1wFYntH1nhdICGOtWtLVrYXQ=="
+#     # <define_database_and_container_name>
+#     database_name = 'prescriptions'
+#     container_name = 'meetings'
+#     loop = asyncio.get_event_loop()
+#     loop.run_until_complete(run_sample(
+#         endpoint, key, database_name, container_name))
 
 
 @app.route('/')
@@ -99,38 +103,44 @@ def index():
 
 
 @app.route('/api/getdata', methods=['GET'])
-@cross_origin(origin='*', headers=['Content-Type'])
+@route_cors(allow_origin="*")
 def get_todos():
 
     return "Get Request API Check"
 
+async def dummy_data():
+    return " dhh"
 
 @app.route('/api/saveprescription', methods=['POST'])
-@cross_origin(origin='*', headers=['Content-Type'])
-def save_data():
-
-    database_obj, container_obj = run_sample()
-    print(run_sample)
+@route_cors(allow_origin="*")
+async def save_data():
    # save prescription in database
     prescription = request.json["prescription"]
     print(prescription)
     #container_obj = ""
+    container_name = 'prescriptions'
+    message = await run_sample(endpoint, key, database_name, container_name, prescription)
+    # task = asyncio.create_task( run_sample(endpoint, key, database_name, container_name, prescription))
+    # print(task)
+    # message = await asyncio.gather(task)
 
-    populate_container_items(container_obj, prescription)
-    return "Data Saved"
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete( run_sample(endpoint, key, database_name, container_name, prescription))
+    return message
 
 
 @app.route('/api/generateprescription', methods=['POST'])
-@cross_origin(origin='*', headers=['Content-Type'])
-def get_prescription():
+@route_cors(allow_origin="*")
+async def get_prescription():
 
     credential = AzureKeyCredential(textanalyticskey)
     text_analytics_client = TextAnalyticsClient(
         endpoint="https://automaticprescriptiongenerator.cognitiveservices.azure.com/", credential=credential)
 
     # read the transcript from database
-
-    documents = [request.json["transcript"]]
+    data =  await request.get_json()
+    print(data)
+    documents = [data["transcript"]]
     print(documents)
 
     patientname = ''
