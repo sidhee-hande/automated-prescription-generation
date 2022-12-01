@@ -17,9 +17,7 @@ export default {
   components: {},
   data() {
     return {
-     isActive: false,
-     enable: true,
-     msg: 'Start Recording',
+   
     }
   },
   mounted() {
