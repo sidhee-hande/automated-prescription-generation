@@ -2,8 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import VueRouter from 'vue-router'
 import Prescription from './components/Prescription.vue'
-import Dashboard from './components/Dashboard.vue'
 import AddPatient from "./components/patients/AddPatient.vue"
+import ViewPatient from "./components/patients/ViewPatient.vue"
+import ViewPrescriptions from "./components/prescriptions/ViewPrescriptions.vue"
 Vue.config.productionTip = false
 import axios from 'axios'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -26,9 +27,10 @@ Vue.prototype.$http = axios;
 Vue.use(VueRouter);
 
 const routes = [
-  { path: '/prescription', component: Prescription },
-  { path: '/dashboard', component: Dashboard },
-  { path: '/add-patient', component: AddPatient},
+  { path: '/prescription/:id', component: Prescription, name: 'Prescription' , params: "id"},
+  { path: '/add-patient', component: AddPatient, name: 'AddPatient'},
+  { path: '/view-patient', component: ViewPatient, name: 'ViewPatient'},
+  { path: '/view-prescriptions', component: ViewPrescriptions, name: 'ViewPrescriptions'},
 
   
 ]

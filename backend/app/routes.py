@@ -67,6 +67,11 @@ async def query_items(container_obj, query_text):
     # within the query_items() method makes network calls to verify the partition key
     # definition in the container
     # <query_items>
+    
+        
+    query_items_response = container_obj.query_items(query=query_text,
+        enable_cross_partition_query=True)
+
     query_items_response = container_obj.query_items(
         query=query_text,
         enable_cross_partition_query=True
@@ -109,9 +114,8 @@ async def add_data(endpoint, key, database_name, container_name, data):
            
             return message
 
-async def get_data(endpoint, key, database_name, container_name):
-    data = " "
-    
+async def get_data(endpoint, key, database_name, container_name, query):
+    items = []
     #<create_cosmos_client>
     async with cosmos_client(endpoint, key) as client:
         # </create_cosmos_client>
@@ -122,17 +126,18 @@ async def get_data(endpoint, key, database_name, container_name):
             container_obj = await get_or_create_container(
                 database_obj, container_name)
 
-            query = "SELECT * FROM c"
-            items = await query_items(container_obj, query)
             
+            items = await query_items(container_obj, query)
+            print(items)
         except exceptions.CosmosHttpResponseError as e:
             print('\nadd_data has caught an error. {0}'.format(e.message))
             data = '\nadd_data has caught an error. {0}'.format(e.message)
             return data
         finally:
             print("\nQuickstart complete")
-            return items
             
+            return items
+    _
 
 
 
@@ -146,7 +151,47 @@ def index():
 @route_cors(allow_origin="*")
 async def get_patient_data():
     container_name = "patients"
-    message = await get_data(endpoint, key, database_name, container_name)
+    query = "SELECT * FROM c"
+    message = await get_data(endpoint, key, database_name, container_name, query)
+    print(message)
+
+    return message
+
+@app.route('/api/getprescriptiondata', methods=['GET'])
+@route_cors(allow_origin="*")
+async def get_prescription_data():
+    container_name = "prescriptions"
+    query = "SELECT * FROM c"
+    message = await get_data(endpoint, key, database_name, container_name, query)
+    print(message)
+
+    return message
+
+@app.route('/api/searchpatientdata', methods=['POST'])
+@route_cors(allow_origin="*")
+async def search_patient():
+    data = await request.get_json()
+    patient_email =  data ["email"]
+
+    container_name = "patients"
+    
+    query = "SELECT * FROM c WHERE c.email='" + patient_email +"'"
+    message = await get_data(endpoint, key, database_name, container_name, query)
+    print(message)
+    
+    return message
+@app.route('/api/searchprescriptiondata', methods=['POST'])
+@route_cors(allow_origin="*")
+async def search_prescription_data():
+    data = await request.get_json()
+    patient_email =  data ["email"]
+
+    container_name = "prescriptions"
+    
+    query = "SELECT * FROM c WHERE c.email='" + patient_email +"'"
+    message = await get_data(endpoint, key, database_name, container_name, query)
+    print(message)
+    
     return message
 
 @app.route('/api/addpatient', methods=['POST'])
@@ -168,8 +213,9 @@ async def add_patient_data():
 async def save_data():
    # save prescription in database
     data = await request.get_json()
-    prescription =  data["prescription"]
-    prescription["id"] = str(uuid.uuid4())
+    prescription =  data["prescription"][0]
+    print(prescription)
+    prescription["prescription_id"] = str(uuid.uuid4())
     print(prescription)
     #container_obj = ""
     container_name = 'prescriptions'

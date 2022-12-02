@@ -6,21 +6,14 @@
           <div class="col-md-5 mt-4 ml-2">
             <div class="">
               <div class="large-ref-btn">
-                <div>
-                  <router-link to="/competitorstore" class="btn">
-                    Competitor Stores
-                  </router-link>
-                  <span class="">
-                    <router-link to="/nanboyastore" class="btn">
-                      Nanboya Stores
-                    </router-link>
-                  </span>
-                </div>
+               
               </div>
             </div>
           </div>
 
-        
+          <div class="col-md-3"></div>
+
+        </div>
 
         <!-- <br> -->
         <div class="row">
@@ -33,15 +26,13 @@
                 class="text-left text-white font-weight-bold"
                 style="margin-bottom: -25px"
               >
-                patients Table
+                Prescriptions Table
               </h5>
 
               <div class="row">
                 <div class="col-md-9"></div>
                 <div class="col-md-3">
-                  <div class="input-icons">
                     <ul>
-                      <i class="fas fa-search iconn"></i>
                       <input
                         type="text"
                         v-model="searchTerm"
@@ -49,60 +40,41 @@
                         placeholder="Search via Email"
                       />
                     </ul>
-                  </div>
+                      <button v-on:click="searchprescription(searchTerm)"> Search</button>
+                 
                 </div>
               </div>
 
               <div class="table-responsive">
                 <table
-                  id="PatientTable"
+                  id="prescriptionTable"
                   class="table align-items-center table-condensed"
                 >
                   <thead>
                     <tr>
                       <th>ID</th>
                       <th>Name</th>
-                      <th>Prefecture</th>
-                      <th>City</th>
-                      <th>Postal Code</th>
-                      <th>Phone Number</th>
                       <th>Email</th>
-                      <!-- <th>Latitude</th>
-                    <th>Longitude</th> -->
-                      <th>Gender</th>
-                      <th>D.O.B</th>
-                      <th>Action</th>
+                     <th>Age</th>
                     </tr>
                   </thead>
                     <tbody>
 
-                  <tr v-for="Patient in pageOfItems" :key="Patient.id">
-                      <td>{{ Patient.id }}</td>
+                  <tr v-for="prescription in prescriptions" :key="prescription.id">
+                      <td>{{ prescription.id }}</td>
                       <td>
-                        {{ Patient.first_name }} {{ Patient.last_name }}
+                        {{ prescription.name }} 
                       </td>
-                      <td>{{ Patient.prefecture }}</td>
-                      <td>{{ Patient.city }}</td>
-                      <td>{{ Patient.postal_code }}</td>
-                      <td>{{ Patient.phone_number }}</td>
-                      <td>{{ Patient.email }}</td>
-                      <!-- <td>{{Patient.latitude}}</td>
-                    <td>{{Patient.longitude}}</td> -->
-                      <td>{{ Patient.gender }}</td>
-                      <td>{{ Patient.date_of_birth }}</td>
-                      <td>
-                        <a v-on:click="editPatient(Patient)">
-                          <i class="fas fa-edit text-info"></i>
-                        </a>
-
-                        <a v-on:click="deletePatient(Patient.email)">
-                          <i class="fas fa-trash text-warning"></i>
-                        </a>
-                      </td>
+                     
+                      <td>{{ prescription.email }}</td>
+                      
+                      <td>{{ prescription.age}}</td>
+                     
 
                   </tr>
                   </tbody>
                 </table>
+               
               </div>
             </div>
           </div>
@@ -114,11 +86,11 @@
           <div class="col-sm-12 col-md-7">
             <ul class="pagination">
               <li class="pagination-bg">
-                <jw-pagination
-                  :items="patients"
+                <!-- <jw-pagination
+                  :items="prescriptions"
                   @changePage="onChangePage"
                   :styles="customStyles"
-                ></jw-pagination>
+                ></jw-pagination> -->
               </li>
             </ul>
           </div>
@@ -132,9 +104,7 @@
 
 import axios from "axios";
 export default {
-  created() {
-    
-  },
+
   data() {
     const customStyles = {
   ul: {
@@ -143,14 +113,14 @@ export default {
   },
 };
     return {
-      patients: [],
+      prescriptions: [],
       searchTerm: "",
       pageOfItems: [],
       customStyles
     };
   },
   computed: {
-   
+ 
   },
 
   methods: {
@@ -158,26 +128,27 @@ export default {
       // update page of items
       this.pageOfItems = pageOfItems;
     },
-    allPatient() {
+    
+    allprescription() {
       axios
-        .get("/api/patients")
-        .then(({ data }) => (this.patients = data))
+        .get("http://localhost:5000/api/getprescriptiondata")
+        .then(({ data }) => (this.prescriptions = data))
         .catch();
     },
-    editPatient(cust) {
-      this.$router.push({ name: "edit-Patient", params: { id: cust } });
-    },
-    deletePatient(email) {
-      this.$router.push({ name: "delete-Patient", params: { id: email } });
+     searchprescription(search_email) {
+        if(search_email.length>0)
+        {
+      axios
+        .post("http://localhost:5000/api/searchprescriptiondata", {"email": search_email})
+        .then(({ data }) => (this.prescriptions = data))
+        .catch();
+        }
     },
 
-    generate() {
-      window.open("/api/export/patients");
-    },
   },
   mounted() {
-    // if i use created() method here, then '/Patient' route will open it w/o even login
-    this.allPatient();
+    // if i use created() method here, then '/prescription' route will open it w/o even login
+    this.allprescription();
   },
 };
 </script>

@@ -28,12 +28,41 @@
                 <label>Patient Name: </label>
               </div>
               <div class="col">
-                <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
-                </b-form-input>
+                <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
+                </b-form-input> -->
+                <p> {{ this.items[0].name}}</p>
               </div>
             </div>
           </div>
-        </div>
+               <div class="col">
+            <div class="row">
+              <div class="col">
+                <label>Patient ID: </label>
+              </div>
+              <div class="col">
+                <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
+                </b-form-input> -->
+                <p> {{ this.items[0].id}}</p>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="row">
+           <div class="col-md-3">
+            <div class="row">
+              <div class="col">
+                <label>Patient Email: </label>
+              </div>
+              <div class="col">
+                <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
+                </b-form-input> -->
+                <p> {{ this.items[0].email}}</p>
+              </div>
+            </div>
+          </div>
+          </div>
+        
+          
         <div class="row">
           <div class="col-md-3">
             <div class="row">
@@ -41,7 +70,8 @@
                 <label>Patient Age: </label>
               </div>
               <div class="col">
-                <b-form-input type="text" v-if="items.edit" v-model="items.age"></b-form-input>
+               <p> {{ this.items[0].age}}</p>
+                <!-- <b-form-input type="text" v-if="items.edit" v-model="items.age"></b-form-input> -->
               </div>
             </div>
 
@@ -171,6 +201,7 @@ export default {
       //       ],
       items: [
         {
+          "id": " ",
           "age": " ", "date": " ", "diagnosis": " ",
           "dosageofmedication": " ", "frequencyofmedication": " ",
           "medicines": " ", "name": " ", "symptoms": " ", "edit": true, "signature": ""
@@ -181,6 +212,10 @@ export default {
   },
   mounted() {
     this.items = this.items.map(item => ({ ...item, isEdit: false }));
+    this.items[0].id = this.$route.params.id;
+    this.items[0].name = this.$route.params.name;
+    this.items[0].age = this.$route.params.age;
+    this.items[0].email = this.$route.params.email;
   },
   methods:
   {

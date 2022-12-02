@@ -1,10 +1,12 @@
 <template>
   <div id="app">
-  <h1> THIS IS THE DASHBOARD</h1>
+  <h1> DOCTOR'S DASHBOARD</h1>
     <!-- <Prescription msg="Welcome to Your Vue.js App"/> -->
-    <router-link to="/dashboard">Home</router-link> |
-    <router-link to="/prescription">Prescription</router-link>
-    <router-link to="/add-patient"> Add Patient </router-link>
+    <router-link to="/add-patient"> Add Patient </router-link> |
+     <router-link to="/view-patient"> View Patients </router-link> |
+      <router-link to="/view-prescriptions"> View Prescriptions</router-link> |
+      <router-link to="/"> Home</router-link> 
+     <br>
       <router-view/>
   </div>
 </template>
