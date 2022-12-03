@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/cf39e2a3-8359-4641-b07d-3991cdf67a6b/AppServices/subscriptions/cf39e2a3-8359-4641-b07d-3991cdf67a6b/resourceGroups/automated-prescription-generator/providers/Microsoft.Web/sites/AutomatedPrescriptionGenerator",
+    "appService.deploySubpath": "."
+}
