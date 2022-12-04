@@ -16,7 +16,7 @@
         {{ this.transcription }}
       </label>
     </div>
-
+{{this.items}}
     <div id="pdf" class="container">
       <h1> PRESCRIPTION </h1>
       <div class="card">
@@ -30,7 +30,7 @@
               <div class="col">
                 <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
                 </b-form-input> -->
-                <p> {{ this.items.name}}</p>
+                <p> {{ this.patientname}}</p>
               </div>
             </div>
           </div>
@@ -234,6 +234,10 @@ export default {
     saveprescription() {
       this.sendEmail()
       this.createPDF()
+       this.items.patient_id= this.patientid;
+    this.items.name = this.patientname;
+    this.items.age= this.patientage;
+    this.items.email = this.patientemail;
 
       axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items, 
       "patientname": this.patientname,
@@ -286,6 +290,12 @@ export default {
         this.enable = false
         axios.post('http://localhost:5000/api/generateprescription', { "transcript": this.transcription })
           .then(response => this.items = response.data);
+     
+    this.items.patient_id= this.patientid;
+    this.items.name = this.patientname;
+    this.items.age= this.patientage;
+    this.items.email = this.patientemail;
+    console.log(this.items)
       }
     },
   }

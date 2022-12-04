@@ -331,7 +331,11 @@ async def get_prescription():
             "medicines": medicinesoutput,
             "dosageofmedication": dosageofmedicationoutput,
             "frequencyofmedication": frequencyofmedicationoutput,
-            "edit": True
+            "edit": True,
+            "name": " ",
+            "age": "  ",
+            "email": " ",
+            "patient_id": " "
 
         }
 
