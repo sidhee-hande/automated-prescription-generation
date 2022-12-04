@@ -160,7 +160,7 @@
       Once you are done editing the prescription, kindly click on the button below to sign and email it to the patient.
     </h5>
     <button class="submit" @click="saveprescription">
-      Sign prescription
+      Save and Email prescription
     </button>
 
   </div>
