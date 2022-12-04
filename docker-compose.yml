@@ -9,7 +9,7 @@ services:
     client:
         build: ./frontend
         volumes:
-            - '.:/frontend'
-            - '/frontend/node_modules'
+            - '.:/app'
+            - '/app/node_modules'
         ports:
             - '8081:8080'
