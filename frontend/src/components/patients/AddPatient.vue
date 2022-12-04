@@ -1,14 +1,16 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <template>
-  <div>
+  <div class="container">
     <form @submit.prevent="submitForm">
       <span>Patient Name:</span><br>
-      <input v-model="details.name" type="text" placeholder="Enter patient's name" /><br>
+      <input v-model="details.name" type="text"  placeholder="Enter patient's name" required/><br>
+     
       <span>Patient Email:</span><br>
-      <input v-model="details.email" type="email" placeholder="Enter patient's email" /><br>
+      <input v-model="details.email" type="email" placeholder="Enter patient's email" required/><br>
      
       <span>Patient Age:</span><br>
-      <input v-model="details.age" type="text" placeholder="Enter patient's age" /><br>
+      <input v-model="details.age" type="number" placeholder="Enter patient's age" required/><br>
+      <br>
       <input class="submit" type="submit" value="Submit">
     
     </form>
@@ -73,14 +75,11 @@ span {
 }
 
 .submit {
-  font-size: 15px;
-  color: #fff;
-  background: #222;
-  padding: 6px 12px;
-  border: none;
-  margin-top: 8px;
-  cursor: pointer;
-  border-radius: 5px;
+    width: 40%;
+  margin: 0 auto;
+  color: white !important;
+  background-image: linear-gradient(to bottom right, #fd7d96, #f16857);
+  border: 0;
 }
 </style>
 

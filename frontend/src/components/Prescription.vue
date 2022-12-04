@@ -30,7 +30,7 @@
               <div class="col">
                 <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
                 </b-form-input> -->
-                <p> {{ this.items[0].name}}</p>
+                <p> {{ this.items.name}}</p>
               </div>
             </div>
           </div>
@@ -42,7 +42,7 @@
               <div class="col">
                 <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
                 </b-form-input> -->
-                <p> {{ this.items[0].id}}</p>
+                <p> {{ this.patientid }}</p>
               </div>
             </div>
           </div>
@@ -56,7 +56,7 @@
               <div class="col">
                 <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
                 </b-form-input> -->
-                <p> {{ this.items[0].email}}</p>
+                <p> {{ this.patientemail}}</p>
               </div>
             </div>
           </div>
@@ -70,7 +70,7 @@
                 <label>Patient Age: </label>
               </div>
               <div class="col">
-               <p> {{ this.items[0].age}}</p>
+               <p> {{ this.patientage}}</p>
                 <!-- <b-form-input type="text" v-if="items.edit" v-model="items.age"></b-form-input> -->
               </div>
             </div>
@@ -182,40 +182,39 @@ export default {
       enable: true,
       msg: 'Start Recording',
       transcription: '',
-      fields: [
-        { key: "name", label: "Name" },
-        { key: "date", label: "Date" },
-        { key: "age", label: "Age" },
-        { key: "symptoms", label: "Symptoms" },
-        { key: "diagnosis", label: "Diagnosis" },
-        { key: "medicines", label: "Medicines" },
-        { key: "dosageofmedication ", label: "Dosage of Medication" },
-        { key: "frequencyofmedication", label: "Frequency of Medication" },
-        { key: 'edit', label: '' }
-      ],
+      patientname: " ",
+      patientemail: " ",
+      patientid: " ",
+      patientage: " ",
+  
       //      items: [
       //       {"age":"45 years old","date":"Mon, 07 Nov 2022","diagnosis":"Covid-19",
       // "dosageofmedication":"100mg ibuprofen ","frequencyofmedication":"ibuprofen twice daily ",
       // "medicines":"ibuprofen","name":"Jeff Bezos","symptoms":"chest pain,cough,fever", "edit": true, "signature": ""}
 
       //       ],
-      items: [
+      items: 
         {
-          "id": " ",
-          "age": " ", "date": " ", "diagnosis": " ",
+          "patient_id": " ", "age": "", "email": " ",
+           "date": " ", "diagnosis": " ",
           "dosageofmedication": " ", "frequencyofmedication": " ",
           "medicines": " ", "name": " ", "symptoms": " ", "edit": true, "signature": ""
         }
 
-      ],
+      ,
     }
   },
   mounted() {
-    this.items = this.items.map(item => ({ ...item, isEdit: false }));
-    this.items[0].id = this.$route.params.id;
-    this.items[0].name = this.$route.params.name;
-    this.items[0].age = this.$route.params.age;
-    this.items[0].email = this.$route.params.email;
+   // this.items = this.items.map(item => ({ ...item, isEdit: false }));
+    this.patientid = this.$route.params.id;
+    this.patientname = this.$route.params.name;
+    this.patientage = this.$route.params.age;
+    this.patientemail = this.$route.params.email;
+    this.items.patient_id= this.$route.params.id;
+    this.items.name = this.$route.params.name;
+    this.items.age= this.$route.params.age;
+    this.items.email = this.$route.params.email;
+  
   },
   methods:
   {
@@ -236,7 +235,12 @@ export default {
       this.sendEmail()
       this.createPDF()
 
-      axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items} )
+      axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items, 
+      "patientname": this.patientname,
+      "patientage" :  this.patientage,
+      "patientemail": this.patientemail,
+      "patientid": this.patientid
+      } )
     },
 
     createPDF() {
@@ -314,12 +318,13 @@ th {
 
 pre {
   text-align: left;
-  color: #d63384;
+  color: black !important;
 }
 
 
 label {
   margin-bottom: 5px;
+  color: white !important;
 }
 
 input[type="submit"] {
@@ -331,11 +336,11 @@ input[type="submit"] {
 }
 
 .card {
-  background-image: linear-gradient(to bottom right, grey, black);
+
   border: 0;
   padding: 5px;
   margin: auto;
-  color: white !important;
+ 
   text-align: center;
 }
 
@@ -350,14 +355,14 @@ input[type="submit"] {
 }
 
 label {
-  color: white;
+  color: black !important;
   font-weight: bold;
   display: block;
   width: fit-content;
 }
 
 p {
-  color: white;
+  color: white !important;
   font-weight: bold;
   width: fit-content;
 

@@ -23,7 +23,7 @@
             <div class="card table-card action-col">
               <div class="card-header justify-content-between"></div>
               <h5
-                class="text-left text-white font-weight-bold"
+                class="text-left text-black font-weight-bold"
                 style="margin-bottom: -25px"
               >
                 Patients Table

@@ -23,7 +23,7 @@
             <div class="card table-card action-col">
               <div class="card-header justify-content-between"></div>
               <h5
-                class="text-left text-white font-weight-bold"
+                class="text-left text-black font-weight-bold"
                 style="margin-bottom: -25px"
               >
                 Prescriptions Table
@@ -53,15 +53,22 @@
                   <thead>
                     <tr>
                       <th>ID</th>
+                      <th>Patient ID</th>
                       <th>Name</th>
                       <th>Email</th>
                      <th>Age</th>
+                     <th>Date</th>
+                      <th>Symptoms</th>
+                     <th>Diagnosis</th>
+                     <th>Medicines</th>
+                     <th>Dosage</th>
                     </tr>
                   </thead>
                     <tbody>
 
                   <tr v-for="prescription in prescriptions" :key="prescription.id">
                       <td>{{ prescription.id }}</td>
+                       <td>{{ prescription.patient_id }}</td>
                       <td>
                         {{ prescription.name }} 
                       </td>
@@ -69,6 +76,12 @@
                       <td>{{ prescription.email }}</td>
                       
                       <td>{{ prescription.age}}</td>
+                      <td>{{ prescription.date}}</td>
+                      <td>{{ prescription.symptoms}}</td>
+                      <td>{{ prescription.diagnosis}}</td>
+                      <td>{{ prescription.medicines}}</td>
+                      <td>{{ prescription.dosageofmedication}}</td>
+                      
                      
 
                   </tr>

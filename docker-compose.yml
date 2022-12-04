@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+    api:
+        build: ./backend
+        ports: 
+            - 5000:5000
+
+    client:
+        build: ./frontend
+        volumes:
+            - '.:/frontend'
+            - '/frontend/node_modules'
+        ports:
+            - '8081:8080'

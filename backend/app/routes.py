@@ -213,9 +213,11 @@ async def add_patient_data():
 async def save_data():
    # save prescription in database
     data = await request.get_json()
-    prescription =  data["prescription"][0]
+    prescription =  data["prescription"]
     print(prescription)
-    prescription["prescription_id"] = str(uuid.uuid4())
+   
+    
+    prescription["id"] = str(uuid.uuid4())
     print(prescription)
     #container_obj = ""
     container_name = 'prescriptions'
@@ -237,8 +239,7 @@ async def get_prescription():
     documents = [data["transcript"]]
     print(documents)
 
-    patientname = ''
-    age = ''
+
     todaysdate = ''
     symptoms = []
     medicines = []
@@ -251,13 +252,13 @@ async def get_prescription():
         documents, language="en")
     result = [doc for doc in response if not doc.is_error]
 
-    for doc in result:
-        for entity in doc.entities:
-            print(f"Entity: {entity.text}")
-            print(f"...Category: {entity.category}")
-            if entity.category == 'Person':
-                patientname = entity.text
-                break
+    # for doc in result:
+    #     for entity in doc.entities:
+    #         print(f"Entity: {entity.text}")
+    #         print(f"...Category: {entity.category}")
+    #         if entity.category == 'Person':
+    #             patientname = entity.text
+    #             break
 
     poller = text_analytics_client.begin_analyze_healthcare_entities(documents)
     result = poller.result()
@@ -275,8 +276,7 @@ async def get_prescription():
             if entity.category == 'SymptomOrSign':
                 print(f"Entity: {entity.text}")
                 symptoms.append(entity.text)
-            if entity.category == 'Age':
-                age = entity.text
+         
             if entity.category == 'Diagnosis':
                 print(f"Entity: {entity.text}")
                 diagnosis.append(entity.text)
@@ -307,8 +307,7 @@ async def get_prescription():
 
         todaysdate = date.today()
 
-        print(patientname)
-        print(age)
+      
         print(todaysdate)
         print(symptoms)
         print(diagnosis)
@@ -326,8 +325,6 @@ async def get_prescription():
         prescription = dict()
         patientid = 1
         prescription[patientid] = {
-            "name": patientname,
-            "age": age,
             "date": todaysdate,
             "symptoms": symptomsoutput,
             "diagnosis": diagnosisoutput,
