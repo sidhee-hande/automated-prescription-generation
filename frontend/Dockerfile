@@ -10,7 +10,7 @@ ADD src src
 
 COPY babel.config.js babel.config.js
 COPY package.json package.json
-
+COPY vue.config.js vue.config.js
 
 RUN npm install
 RUN npm install @vue/cli@5.0.8 -g

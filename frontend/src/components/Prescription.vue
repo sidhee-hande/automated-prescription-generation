@@ -16,7 +16,7 @@
         {{ this.transcription }}
       </label>
     </div>
-
+<!-- {{this.items}} -->
     <div id="pdf" class="container">
       <h1> PRESCRIPTION </h1>
       <div class="card">
@@ -28,12 +28,41 @@
                 <label>Patient Name: </label>
               </div>
               <div class="col">
-                <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
-                </b-form-input>
+                <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
+                </b-form-input> -->
+                <p> {{ this.patientname}}</p>
               </div>
             </div>
           </div>
-        </div>
+               <div class="col">
+            <div class="row">
+              <div class="col">
+                <label>Patient ID: </label>
+              </div>
+              <div class="col">
+                <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
+                </b-form-input> -->
+                <p> {{ this.patientid }}</p>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="row">
+           <div class="col-md-3">
+            <div class="row">
+              <div class="col">
+                <label>Patient Email: </label>
+              </div>
+              <div class="col">
+                <!-- <b-form-input type="text" v-if="items.edit" v-model="items.name" class="mb-2 mr-sm-2 mb-sm-0">
+                </b-form-input> -->
+                <p> {{ this.patientemail}}</p>
+              </div>
+            </div>
+          </div>
+          </div>
+        
+          
         <div class="row">
           <div class="col-md-3">
             <div class="row">
@@ -41,7 +70,8 @@
                 <label>Patient Age: </label>
               </div>
               <div class="col">
-                <b-form-input type="text" v-if="items.edit" v-model="items.age"></b-form-input>
+               <p> {{ this.patientage}}</p>
+                <!-- <b-form-input type="text" v-if="items.edit" v-model="items.age"></b-form-input> -->
               </div>
             </div>
 
@@ -152,70 +182,69 @@ export default {
       enable: true,
       msg: 'Start Recording',
       transcription: '',
-      fields: [
-        { key: "name", label: "Name" },
-        { key: "date", label: "Date" },
-        { key: "age", label: "Age" },
-        { key: "symptoms", label: "Symptoms" },
-        { key: "diagnosis", label: "Diagnosis" },
-        { key: "medicines", label: "Medicines" },
-        { key: "dosageofmedication ", label: "Dosage of Medication" },
-        { key: "frequencyofmedication", label: "Frequency of Medication" },
-        { key: 'edit', label: '' }
-      ],
+      patientname: " ",
+      patientemail: " ",
+      patientid: " ",
+      patientage: " ",
+  
       //      items: [
       //       {"age":"45 years old","date":"Mon, 07 Nov 2022","diagnosis":"Covid-19",
       // "dosageofmedication":"100mg ibuprofen ","frequencyofmedication":"ibuprofen twice daily ",
       // "medicines":"ibuprofen","name":"Jeff Bezos","symptoms":"chest pain,cough,fever", "edit": true, "signature": ""}
 
       //       ],
-      items: [
+      items: 
         {
-          "age": " ", "date": " ", "diagnosis": " ",
+          "patient_id": " ", "age": "", "email": " ",
+           "date": " ", "diagnosis": " ",
           "dosageofmedication": " ", "frequencyofmedication": " ",
           "medicines": " ", "name": " ", "symptoms": " ", "edit": true, "signature": ""
         }
 
-      ],
+      ,
     }
   },
   mounted() {
-    this.items = this.items.map(item => ({ ...item, isEdit: false }));
+   // this.items = this.items.map(item => ({ ...item, isEdit: false }));
+    this.patientid = this.$route.params.id;
+    this.patientname = this.$route.params.name;
+    this.patientage = this.$route.params.age;
+    this.patientemail = this.$route.params.email;
+    this.items.patient_id= this.$route.params.id;
+    this.items.name = this.$route.params.name;
+    this.items.age= this.$route.params.age;
+    this.items.email = this.$route.params.email;
+  
   },
   methods:
   {
-
-    sendEmail(pdf) {
-      var file3 = pdf.output('blob')
-
-      function getBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-        });
+    sendEmail() {
+      var contactParams = {
+        patient_name: this.items.name,
+        from_email: "automatedprescriptions@gmail.com",
+        to_email: "skc86@cornell.edu"
       }
-
-      var promise = getBase64(file3);
-      promise.then(function (result) {
-        console.log(result)
-      });
-
-
-
-
-
-
-
+      emailjs.send('service_prgws4h', 'template_1xran0s', contactParams, 'wXlM_KPvNXTs0G7Kz')
+        .then((result) => {
+          console.log('SUCCESS!', result.text);
+        }, (error) => {
+          console.log('FAILED...', error.text);
+        });
     },
     saveprescription() {
-
+      this.sendEmail()
       this.createPDF()
+       this.items.patient_id= this.patientid;
+    this.items.name = this.patientname;
+    this.items.age= this.patientage;
+    this.items.email = this.patientemail;
 
-
-
-      axios.post('http://localhost:5000/api/saveprescription', { "prescription": this.items })
+      axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items, 
+      "patientname": this.patientname,
+      "patientage" :  this.patientage,
+      "patientemail": this.patientemail,
+      "patientid": this.patientid
+      } )
     },
 
     createPDF() {
@@ -225,6 +254,7 @@ export default {
       let srcWidth = document.getElementById('pdf').scrollWidth;
       let margin = 30; // narrow margin - 1.27 cm (36);
       let scale = (pWidth - margin * 2) / srcWidth;
+
       pdf.html(document.getElementById('pdf'), {
         x: margin,
         y: margin,
@@ -232,46 +262,9 @@ export default {
           scale: scale,
         },
         callback: function () {
-          var file3 = pdf.output('blob')
-
-          function getBase64(file) {
-            return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.readAsDataURL(file);
-              reader.onload = () => resolve(reader.result);
-              reader.onerror = error => reject(error);
-            });
-          }
-
-          var promise = getBase64(file3);
-          promise.then(function (result) {
-            console.log(result)
-
-            var contactParams = {
-              from_email: "automatedprescriptions@gmail.com",
-              to_email: "skc86@cornell.edu",
-              content: result
-            }
-
-            emailjs.send('service_prgws4h', 'template_1xran0s', contactParams, 'wXlM_KPvNXTs0G7Kz')
-              .then((result) => {
-                console.log('SUCCESS!', result.text);
-              }, (error) => {
-                console.log('FAILED...', error.text);
-              });
-          });
-
-
-
           pdf.save('Prescription.pdf')
         }
-
       });
-
-
-      //this.sendEmail(pdf)
-
-
     },
 
     editRowHandler(data) {
@@ -297,6 +290,12 @@ export default {
         this.enable = false
         axios.post('http://localhost:5000/api/generateprescription', { "transcript": this.transcription })
           .then(response => this.items = response.data);
+     
+    this.items.patient_id= this.patientid;
+    this.items.name = this.patientname;
+    this.items.age= this.patientage;
+    this.items.email = this.patientemail;
+    console.log(this.items)
       }
     },
   }
@@ -329,12 +328,13 @@ th {
 
 pre {
   text-align: left;
-  color: #d63384;
+  color: black !important;
 }
 
 
 label {
   margin-bottom: 5px;
+  color: white !important;
 }
 
 input[type="submit"] {
@@ -346,11 +346,11 @@ input[type="submit"] {
 }
 
 .card {
-  background-image: linear-gradient(to bottom right, grey, black);
+
   border: 0;
   padding: 5px;
   margin: auto;
-  color: white !important;
+ 
   text-align: center;
 }
 
@@ -365,14 +365,14 @@ input[type="submit"] {
 }
 
 label {
-  color: white;
+  color: black !important;
   font-weight: bold;
   display: block;
   width: fit-content;
 }
 
 p {
-  color: white;
+  color: black !important;
   font-weight: bold;
   width: fit-content;
 
