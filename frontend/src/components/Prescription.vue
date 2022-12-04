@@ -16,7 +16,7 @@
         {{ this.transcription }}
       </label>
     </div>
-{{this.items}}
+<!-- {{this.items}} -->
     <div id="pdf" class="container">
       <h1> PRESCRIPTION </h1>
       <div class="card">
