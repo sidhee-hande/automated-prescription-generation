@@ -362,7 +362,7 @@ label {
 }
 
 p {
-  color: white !important;
+  color: black !important;
   font-weight: bold;
   width: fit-content;
 
