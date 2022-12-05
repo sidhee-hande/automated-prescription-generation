@@ -14,7 +14,7 @@
       <input class="submit" type="submit" value="Submit">
     
     </form>
-   <p style="color:white"> {{ message}} </p>
+   <h5 style="color:white"> {{ message}} </h5>
   </div>
 </template>
  
