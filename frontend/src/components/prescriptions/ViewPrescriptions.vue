@@ -144,7 +144,7 @@ export default {
     
     allprescription() {
       axios
-        .get("http://localhost:5000/api/getprescriptiondata")
+        .get("https://prescriptiongeneratorserver.azurewebsites.net/api/getprescriptiondata")
         .then(({ data }) => (this.prescriptions = data))
         .catch();
     },
@@ -152,7 +152,7 @@ export default {
         if(search_email.length>0)
         {
       axios
-        .post("http://localhost:5000/api/searchprescriptiondata", {"email": search_email})
+        .post("https://prescriptiongeneratorserver.azurewebsites.net/api/searchprescriptiondata", {"email": search_email})
         .then(({ data }) => (this.prescriptions = data))
         .catch();
         }

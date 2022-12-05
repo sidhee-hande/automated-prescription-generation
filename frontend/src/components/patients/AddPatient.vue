@@ -14,7 +14,7 @@
       <input class="submit" type="submit" value="Submit">
     
     </form>
-   <p> {{ message}} </p>
+   <p style="color:white"> {{ message}} </p>
   </div>
 </template>
  
@@ -46,7 +46,7 @@ export default {
       
       this.formSubmitted = true
       axios
-        .post('http://localhost:5000/api/addpatient',  { "patient": this.details} ).then( 
+        .post('https://prescriptiongeneratorserver.azurewebsites.net/api/addpatient',  { "patient": this.details} ).then( 
           response => this.message = response.data);
 
     },

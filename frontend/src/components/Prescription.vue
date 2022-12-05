@@ -4,17 +4,17 @@
       <button v-if="enable" class="ui button toggle" @click="toggle"> {{ this.msg }}</button>
     </div>
     <br>
-    <div class="container">
+    <div>
 
-      <p v-if="isActive"> Recording
+      <p v-if="isActive"> Recording:
         <vue-speech @onTranscriptionEnd="onEnd" />
       </p>
     </div>
-    <div class="container">
-      <label v-if="!enable">
+    <div>
+      <p v-if="!enable">
         Transcript:
         {{ this.transcription }}
-      </label>
+      </p>
     </div>
 <!-- {{this.items}} -->
     <div id="pdf" class="container">
@@ -222,7 +222,7 @@ export default {
       var contactParams = {
         patient_name: this.items.name,
         from_email: "automatedprescriptions@gmail.com",
-        to_email: "skc86@cornell.edu"
+        to_email: "sph75@cornell.edu"
       }
       emailjs.send('service_prgws4h', 'template_1xran0s', contactParams, 'wXlM_KPvNXTs0G7Kz')
         .then((result) => {
@@ -232,29 +232,27 @@ export default {
         });
     },
     saveprescription() {
-      this.sendEmail()
-      this.createPDF()
+      //this.sendEmail()
+      this.createPDF(this.patientemail)
        this.items.patient_id= this.patientid;
     this.items.name = this.patientname;
     this.items.age= this.patientage;
     this.items.email = this.patientemail;
 
-      axios.post('http://localhost:5000/api/saveprescription',  { "prescription": this.items, 
+      axios.post('https://prescriptiongeneratorserver.azurewebsites.net/api/saveprescription',  { "prescription": this.items, 
       "patientname": this.patientname,
       "patientage" :  this.patientage,
       "patientemail": this.patientemail,
       "patientid": this.patientid
       } )
     },
-
-    createPDF() {
+createPDF(patientemailid) {
 
       let pdf = new jsPDF('p', 'pt', 'a4');
       let pWidth = pdf.internal.pageSize.width; // 595.28 is the width of a4
       let srcWidth = document.getElementById('pdf').scrollWidth;
       let margin = 30; // narrow margin - 1.27 cm (36);
       let scale = (pWidth - margin * 2) / srcWidth;
-
       pdf.html(document.getElementById('pdf'), {
         x: margin,
         y: margin,
@@ -262,11 +260,48 @@ export default {
           scale: scale,
         },
         callback: function () {
+          var file3 = pdf.output('blob')
+
+          function getBase64(file) {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = error => reject(error);
+            });
+          }
+
+          var promise = getBase64(file3);
+          promise.then(function (result) {
+            console.log(result)
+
+            var contactParams = {
+              from_email: "automatedprescriptions@gmail.com",
+              to_email: patientemailid,
+              content: result
+            }
+
+            emailjs.send('service_prgws4h', 'template_1xran0s', contactParams, 'wXlM_KPvNXTs0G7Kz')
+              .then((result) => {
+                console.log('SUCCESS!', result.text);
+              }, (error) => {
+                console.log('FAILED...', error.text);
+              });
+          });
+
+
+
           pdf.save('Prescription.pdf')
         }
-      });
-    },
 
+      });
+
+
+      //this.sendEmail(pdf)
+
+
+    },
+   
     editRowHandler(data) {
       this.items[data.index].isEdit = !this.items[data.index].isEdit;
     },
@@ -288,7 +323,7 @@ export default {
       }
       else {
         this.enable = false
-        axios.post('http://localhost:5000/api/generateprescription', { "transcript": this.transcription })
+        axios.post('https://prescriptiongeneratorserver.azurewebsites.net/api/generateprescription', { "transcript": this.transcription })
           .then(response => this.items = response.data);
      
     this.items.patient_id= this.patientid;
